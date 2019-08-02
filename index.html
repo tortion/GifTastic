@@ -17,19 +17,19 @@
     <div class="jumbotron">
         <h1 class="display-4">Click a damn animal...</h1>
         <hr class="my-4">
-        <p>So many to choose from</p>
+        <p>So many to choose from... or add your own!</p>
 
-    <button type="button" class="btn btn-primary" onclick="playGif('cats')">Cats !!</button>
-    <button type="button" class="btn btn-primary" onclick="playGif('dogs')">Dogs !!</button>
-    <button type="button" class="btn btn-primary" onclick="playGif('mice')">Mice!!</button>
-    <button type="button" class="btn btn-primary" onclick="playGif('frogs')">Frogs!!</button>
-    <button type="button" class="btn btn-primary" onclick="playGif('wilderbeasts')">Wilderbeasts!!</button>
-    <button type="button" class="btn btn-primary" onclick="playGif('primates')">Primates!!</button>
-    <button type="button" class="btn btn-primary" onclick="playGif('pirates')">Pirates!!</button>
-    <button type="button" class="btn btn-primary" onclick="playGif('marsupials')">Marsupials!!</button>
-    <button type="button" class="btn btn-primary" onclick="playGif('marmots')">Marmots!!</button>
-    <button type="button" class="btn btn-primary" onclick="playGif('mongoose')">Mongoose!!</button>
-</div>
+        <form id="gif-form">
+            <label for="gif-input"></label>
+            <input type="text" id="gif-input">
+
+            <!-- Button triggers new movie to be added -->
+            <input id="add-gif" type="submit" value="Add-a-Gif">
+        </form>
+
+        <br>
+        <div id="buttons-view"></div>
+    </div>
 
     <div class="container">
         <div class="row">
@@ -46,14 +46,49 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <script type="text/javascript">
-        function playGif(animal) {
+
+        var gifSubjects = ["Dog", "Cat", "Mouse", "Rat", "Fly", "Knat", "Primate", "Pirate", "Marmot", "Marsupial", "Mongoose"];
+        
+        renderButtons();
+
+        // main event click
+        
+        $(document).on("click", ".gif-btn", playGif);
+
+        $("#add-gif").on("click", function (event) {
+            event.preventDefault();
+            var newGif = $("#gif-input").val().trim();
+            // The movie from the textbox is then added to our array
+            gifSubjects.push(newGif);
+            renderButtons();
+        });
+
+      // Calling the renderButtons function to display the intial buttons
+      renderButtons();
+
+        function renderButtons() {
+
+            $("#buttons-view").empty();
+            for (var i = 0; i < gifSubjects.length; i++) {
+                var a = $('<button type="button" class="btn btn-primary mr-2">');
+
+                a.addClass("gif-btn");
+                a.attr("data-name", gifSubjects[i]);
+                a.text(gifSubjects[i]);
+                $("#buttons-view").append(a);
+            }
+        }
+
+        function playGif(selectedGif) {
 
             var innerIndex = 1;
             var rowNum = "";
 
             // Storing our giphy API URL for a random cat image
 
-            var queryURL = "https://api.giphy.com/v1/gifs/random?api_key=BkaUZZWcFij6J7AoQj3WtPb1R2p9O6V9&tag=" + animal;
+            var gifToPlay = $(this).attr("data-name");
+            console.log(gifToPlay);
+            var queryURL = "https://api.giphy.com/v1/gifs/random?api_key=BkaUZZWcFij6J7AoQj3WtPb1R2p9O6V9&tag=" + gifToPlay;
 
             $("#image-row-1").empty();
             $("#image-row-2").empty();
