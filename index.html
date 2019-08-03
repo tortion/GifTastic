@@ -10,6 +10,7 @@
             width: 400px;
         }
     </style>
+    
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
 
@@ -48,11 +49,12 @@
     <script type="text/javascript">
 
         var gifSubjects = ["Dog", "Cat", "Mouse", "Rat", "Fly", "Knat", "Primate", "Pirate", "Marmot", "Marsupial", "Mongoose"];
-        
+
         renderButtons();
+        playGif();
 
         // main event click
-        
+
         $(document).on("click", ".gif-btn", playGif);
 
         $("#add-gif").on("click", function (event) {
@@ -63,8 +65,26 @@
             renderButtons();
         });
 
-      // Calling the renderButtons function to display the intial buttons
-      renderButtons();
+        $(".gif").on("click", function () {
+            console.log("in");
+            // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+            var state = $(this).attr("data-state");
+            // If the clicked image's state is still, update its src attribute to what its data-animate value is.
+            // Then, set the image's data-state to animate
+            // Else set src to the data-still value
+            if (state === "still") {
+                $(this).attr("src", $(this).attr("data-animate"));
+                $(this).attr("data-state", "animate");
+                console.log("top");
+            } else {
+                $(this).attr("src", $(this).attr("data-still"));
+                $(this).attr("data-state", "still");
+                console.log("bottom");
+            }
+        });
+
+        // Calling the renderButtons function to display the intial buttons
+        renderButtons();
 
         function renderButtons() {
 
@@ -79,15 +99,13 @@
             }
         }
 
-        function playGif(selectedGif) {
+        function playGif() {
 
             var innerIndex = 1;
             var rowNum = "";
+            var gifToPlay = "";
 
-            // Storing our giphy API URL for a random cat image
-
-            var gifToPlay = $(this).attr("data-name");
-            console.log(gifToPlay);
+            gifToPlay = $(this).attr("data-name");
             var queryURL = "https://api.giphy.com/v1/gifs/random?api_key=BkaUZZWcFij6J7AoQj3WtPb1R2p9O6V9&tag=" + gifToPlay;
 
             $("#image-row-1").empty();
@@ -107,7 +125,8 @@
 
                         console.log(response);
 
-                        var imageUrl = response.data.fixed_width_small_url;
+                        var stillImageUrl = response.data.fixed_width_small_still_url;
+                        var loopingImageUrl = response.data.fixed_width_small_url;
 
                         if (innerIndex < 6) {
                             rowNum = "1"
@@ -116,15 +135,19 @@
                         }
 
                         // Creating and storing an image tag
-                        var catImage = $("<img>");
-                        catImage.attr("src", imageUrl);
-                        catImage.attr("alt", "cat image");
+                        var gifImage = $("<img>");
+                        gifImage.attr("src", stillImageUrl);
+                        gifImage.attr("data-still", stillImageUrl);
+                        gifImage.attr("data-animate", loopingImageUrl);
+                        gifImage.attr("data-state", "still");
+                        gifImage.attr("alt", response.data.title);
+                        gifImage.attr("class", "gif");
                         let imageTag = "#image-row-" + rowNum;
-                        $(imageTag).append(catImage);
+                        $(imageTag).append(gifImage);
 
-                        var catTitle = (response.data.title);
+                        var gifTitle = (response.data.title);
                         let titleTag = "#title-row-" + rowNum;
-                        $(titleTag).append(catTitle);
+                        $(titleTag).append(gifTitle);
                         innerIndex++;
                     });
             }
